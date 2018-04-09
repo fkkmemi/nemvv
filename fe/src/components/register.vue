@@ -7,8 +7,8 @@
               <v-toolbar dark color="deep-orange">
                 <v-toolbar-title>
                   <v-tooltip bottom>
-                    <span slot="activator">LKSS 회원가입</span>
-                    <span>LOOP Kids Safe School<br>루프 어린이 안심통학 서비스<br>가입후 관리자의 승인후에 사용할 수 있습니다.</span>
+                    <span slot="activator">NEMVV 회원 가입</span>
+                    <span>Node.js Express.js MongoDB Vue Vuetify<br>https://github.com/fkkmemi/nemvv.git</span>
                   </v-tooltip>
                 </v-toolbar-title>
                 <v-spacer></v-spacer>
