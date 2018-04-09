@@ -73,11 +73,11 @@
   export default {
     data: () => ({
       drawer: null,
-      active: true,
       items: [
         {
           action: 'feedback',
           title: '게시판',
+          active: true,
           items: [
             {
               title: '공지사항',
