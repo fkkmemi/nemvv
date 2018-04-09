@@ -9,7 +9,7 @@ module.exports = {
 
     // First application
     {
-      name      : 'fw',
+      name      : 'nemvv',
       script    : 'bin/www',
       // watch: ["bin","routes","views","system"],
       ignore_watch : ["node_modules","cfg"],
