@@ -24,6 +24,7 @@ import {
   VProgressLinear,
   VDialog,
   VAlert,
+  VMenu,
 } from 'vuetify';
 import axios from 'axios';
 import moment from 'moment';
@@ -31,6 +32,7 @@ import swal from 'sweetalert';
 import * as VueGoogleMaps from 'vue2-google-maps';
 import VueCookie from 'vue-cookie';
 
+import 'babel-polyfill';
 import cfg from '../static/cfg';
 import App from './App';
 import router from './router';
@@ -60,11 +62,25 @@ axios.interceptors.response.use((res) => {
 }, (err) => {
   // console.log(err.response.status);
   if (err.response.status === 401) {
-    location.href = '/#/sign';
+    // swal({
+    //   icon: 'warning',
+    //   title: '실패',
+    //   text: '다시 로그인 해주세요',
+    //   timer: 2000,
+    // })
+    //   .then(() => {
+    //     location.href = '/#/sign';
+    //     // return Promise.resolve({ success: true });
+    //   })
+    //   .catch((e) => {
+    //     Promise.reject(e);
+    //   });
     // return Promise.reject(err);
-    // return Promise.resolve(err);
+    // Promise.reject(err);
+    location.href = '/#/sign';
+  } else {
+    Promise.reject(err);
   }
-  return Promise.reject(err);
 });
 
 Vue.prototype.$axios = axios;
@@ -96,6 +112,7 @@ Vue.use(Vuetify, {
     VProgressLinear,
     VDialog,
     VAlert,
+    VMenu,
   },
 });
 

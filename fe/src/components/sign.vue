@@ -99,7 +99,8 @@
           .then((res) => {
             if (!res.data.success) throw new Error(res.data.msg);
             // return this.swalSuccess(`token: ${res.data.token}`);
-            return this.swalSuccess(`token: ${res.headers['www-authenticate']}`);
+            // return this.swalSuccess(`token: ${res.headers['www-authenticate']}`);
+            return this.swalSuccess('로그인 되었습니다. 메인페이지로 이동합니다');
           })
           .then(() => {
             location.href = '/#/';

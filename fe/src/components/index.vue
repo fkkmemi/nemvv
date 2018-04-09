@@ -41,7 +41,7 @@
       </v-list-group>
     </v-list>
   </v-navigation-drawer>
-  <v-toolbar color="deep-orange" dark fixed app>
+  <v-toolbar color="teal" dark fixed app>
     <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
     <!--<img src="/static/logo.png" height="40" />-->
     <v-icon>tag_faces</v-icon>
@@ -53,9 +53,26 @@
       <span class="hidden-sm-and-down"> Project</span>
     </v-toolbar-title>
     <v-spacer></v-spacer>
-    <v-btn icon>
-      <v-icon>more_vert</v-icon>
-    </v-btn>
+    <!--<v-menu bottom left>-->
+      <!--<v-btn icon>-->
+        <!--<v-icon>more_vert</v-icon>-->
+      <!--</v-btn>-->
+      <!--<v-list>-->
+        <!--<v-list-tile v-for="(item, i) in tmenus" :key="i" @click="item.click">-->
+          <!--<v-list-tile-title>{{ item.title }}</v-list-tile-title>-->
+        <!--</v-list-tile>-->
+      <!--</v-list>-->
+    <!--</v-menu>-->
+    <v-menu bottom left>
+      <v-btn icon slot="activator" dark>
+        <v-icon>more_vert</v-icon>
+      </v-btn>
+      <v-list>
+        <v-list-tile @click="signout">
+          <v-list-tile-title>로그아웃</v-list-tile-title>
+        </v-list-tile>
+      </v-list>
+    </v-menu>
   </v-toolbar>
   <v-content>
     <router-view/>
@@ -123,9 +140,47 @@
           ],
         },
       ],
+      menus: [
+        {
+          title: '로그아웃',
+          click: 'signout',
+        },
+      ],
     }),
     props: {
       source: String,
+    },
+    methods: {
+      swalSuccess(msg) {
+        return this.$swal({
+          icon: 'success',
+          title: '성공',
+          text: msg,
+          timer: 2000,
+        });
+      },
+      swalWarning(msg) {
+        return this.$swal({
+          icon: 'warning',
+          title: '실패',
+          text: msg,
+          timer: 2000,
+        });
+      },
+      swalError(msg) {
+        return this.$swal({
+          icon: 'error',
+          title: '에러',
+          text: msg,
+          timer: 2000,
+        });
+      },
+      signout() {
+        this.$cookie.delete('token');
+        this.swalSuccess('로그아웃 되었습니다')
+          .then(() => { location.href = '/#/sign'; })
+          .cache(e => this.swalError(e.message));
+      },
     },
   };
 </script>

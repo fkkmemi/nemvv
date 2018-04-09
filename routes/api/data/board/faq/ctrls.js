@@ -63,9 +63,9 @@ exports.read = (req, res) => {
   const s = { $inc: { cntView: 1 } };
   const o = { new: true };
   Faq.findOneAndUpdate(f, s, o)
-    // .where('_id').equals(_id)
-    // .select('content')
-    // .populate({ path: 'u_id', select:'id'})
+  // .where('_id').equals(_id)
+  // .select('content')
+  // .populate({ path: 'u_id', select:'id'})
     .populate({
       path: 'cmt_ids',
       populate: {
@@ -95,10 +95,10 @@ exports.add = (req, res) => {
   });
   bd.save()
     .then(() => {
-      res.send({success: true});
+      res.send({ success: true });
     })
     .catch((err) => {
-      res.send({success: false, msg : err.message});
+      res.send({ success: false, msg : err.message });
     });
 };
 
@@ -113,7 +113,12 @@ exports.mod = (req, res) => {
   const f = { _id: set._id };
   const s = { $set: set };
 
-  Faq.findOneAndUpdate(f, s)
+  Faq.findOne(f)
+    .select('u_id')
+    .then((r) => {
+      if (r.u_id.toString() !== req.user._id) throw new Error('you have no authority');
+      return Faq.update(f, s);
+    })
     .then(() => {
       res.send({ success: true });
     })
@@ -128,7 +133,9 @@ exports.del = (req, res) => {
   if (!_id) return res.send({ success: false, msg: 'id not exists' });
   let cp;
   Faq.findOne({ _id: _id })
+    .select('u_id cmt_ids')
     .then((r) => {
+      if (r.u_id.toString() !== req.user._id) throw new Error('you have no authority');
       cp = r;
       return FaqComment.remove({ _id: { $in: r.cmt_ids } });
     })
@@ -182,7 +189,13 @@ exports.modCmt = (req, res) => {
   const f = { _id: set._id };
   const s = { $set: set };
 
-  FaqComment.findOneAndUpdate(f, s)
+  // FaqComment.findOneAndUpdate(f, s)
+  FaqComment.findOne(f)
+    .select('u_id')
+    .then((r) => {
+      if (r.u_id.toString() !== req.user._id) throw new Error('you have no authority');
+      return FaqComment.update(f, s);
+    })
     .then(() => {
       res.send({ success: true });
     })
@@ -195,8 +208,10 @@ exports.delCmt = (req, res) => {
   const _id = req.query._id;
   if (!_id) return res.send({ success: false, msg : 'param id not exists' });
   FaqComment.findOne({_id:_id})
+    .select('u_id bd_id')
     .then((r) => {
       if (!r) throw new Error('group not exists');
+      if (r.u_id.toString() !== req.user._id) throw new Error('you have no authority');
       const f = { _id: r.bd_id };
       const s = { $pull: { cmt_ids: r._id } };
       return Faq.updateOne(f, s);
