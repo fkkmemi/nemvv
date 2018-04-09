@@ -47,7 +47,7 @@
     <v-icon>tag_faces</v-icon>
     <v-toolbar-title>
       <v-tooltip bottom>
-        <span slot="activator">NEMVV 로그인</span>
+        <span slot="activator">NEMVV</span>
         <span>Node.js Express.js MongoDB Vue Vuetify<br>https://github.com/fkkmemi/nemvv.git</span>
       </v-tooltip>
       <span class="hidden-sm-and-down"> Project</span>
