@@ -1,0 +1,91 @@
+#!/usr/bin/env node
+
+const fs = require('fs');
+if(!fs.existsSync('./cfg/cfg.js')) {
+  console.error('./cfg/cfg.js not exists');
+  process.exit(1);
+}
+var cfg = require('../cfg/cfg');
+
+/**
+ * Module dependencies.
+ */
+
+var app = require('../app');
+var debug = require('debug')('nemvv:server');
+
+if(cfg.web.http.use) {
+  var http = require('http');
+  var server = http.createServer(app).listen(cfg.web.http.port);
+  server.on('error', onError);
+  server.on('listening', onListening);
+}
+
+if(cfg.web.https.use) {
+  var https = require('https');
+  var o = {
+    key: fs.readFileSync(cfg.web.https.key),
+    cert: fs.readFileSync(cfg.web.https.cert),
+    ca: [fs.readFileSync(cfg.web.https.ca)]
+  }
+  var servers = https.createServer(o, app).listen(cfg.web.https.port);
+  servers.on('error', onError);
+  servers.on('listening', onListenings);
+}
+
+/**
+ * Event listener for HTTP server "error" event.
+ */
+
+function onError(error) {
+  if (error.syscall !== 'listen') {
+    throw error;
+  }
+  let port = 0;
+  var bind = typeof port === 'string'
+    ? 'Pipe ' + port
+    : 'Port ' + port;
+
+  // handle specific listen errors with friendly messages
+  switch (error.code) {
+    case 'EACCES':
+      console.error(bind + ' requires elevated privileges');
+      process.exit(1);
+      break;
+    case 'EADDRINUSE':
+      console.error(bind + ' is already in use');
+      process.exit(1);
+      break;
+    default:
+      throw error;
+  }
+}
+
+/**
+ * Event listener for HTTP server "listening" event.
+ */
+
+function onListening() {
+  var addr = server.address();
+  var bind = typeof addr === 'string'
+    ? 'pipe ' + addr
+    : 'port ' + addr.port;
+  debug('HTTP Listening on ' + bind);
+}
+
+/**
+ * Event listener for HTTPS server "listening" event.
+ */
+
+function onListenings() {
+  var addr = servers.address();
+  var bind = typeof addr === 'string'
+    ? 'pipe ' + addr
+    : 'port ' + addr.port;
+  debug('HTTPS Listening on ' + bind);
+}
+// console.log(process.env.NODE_ENV);
+// if( process.env.NODE_ENV == 'production' ) {
+//   console.log("Production Mode");
+// // }
+// else if( process.env.NODE_ENV == 'development' ) { console.log("Development Mode"); }
