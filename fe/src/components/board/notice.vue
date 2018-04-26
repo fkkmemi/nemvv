@@ -1,6 +1,9 @@
 <template>
-  <v-container fluid>
+  <v-container fluid class="pa-0">
     <v-card flat>
+      <!--<v-cart-title primary-title>-->
+        <!--<h3>공지사항</h3>-->
+      <!--</v-cart-title>-->
       <v-card-text>
         <v-layout row>
           <v-flex xs8 sm4>
@@ -13,11 +16,11 @@
             <!--<v-btn color="primary" fab small @click.native.stop="dialog = true">-->
 
             <!--<v-btn-->
-              <!--color="primary"-->
-              <!--fab-->
-              <!--small-->
-              <!--@click.native.stop="mdAddOpen">-->
-              <!--<v-icon>add</v-icon>-->
+            <!--color="primary"-->
+            <!--fab-->
+            <!--small-->
+            <!--@click.native.stop="mdAddOpen">-->
+            <!--<v-icon>add</v-icon>-->
             <!--</v-btn>-->
           </v-flex>
         </v-layout>
@@ -48,7 +51,7 @@
                           pagination.descending ? 'desc' : 'asc',
                           header.value === pagination.sortBy ? 'active' : '',
                           header.value === '_id' ? 'hidden-sm-and-down' : '',
-                          header.value === 'u_id' ? 'hidden-sm-and-down' : '' ,
+                          header.value === 'u_id' ? 'hidden-md-and-down' : '' ,
                           header.value === 'cmt_ids' ? 'hidden-md-and-down' : '']"
                 @click="changeSort(header.value)"
               >
@@ -68,8 +71,8 @@
             </v-tooltip>
           </template>
           <template slot="items" slot-scope="props">
-            <td class="hidden-sm-and-down">{{ id2time(props.item._id) }}</td>
-            <td class="hidden-sm-and-down">{{ props.item.u_id.id }}</td>
+            <td class="hidden-sm-and-down">{{ id2time(props.item._id).toLocaleString() }}</td>
+            <td class="hidden-md-and-down">{{ props.item.u_id.id }}</td>
             <td>{{ props.item.title }}</td>
             <td class="text-xs-right">{{ props.item.cntView }}</td>
             <td class="hidden-md-and-down text-xs-right">{{ props.item.cmt_ids.length }}</td>
@@ -93,11 +96,11 @@
           </template>
           <template slot="expand" slot-scope="props">
             <v-card>
-              <v-card-title>
-                <span class="hidden-md-and-up"><strong>등록일:</strong> {{ id2time(props.item._id) }}</span>
+              <v-card-title class="hidden-md-and-up">
+                <span><strong>등록일:</strong> {{ id2time(props.item._id).toLocaleString() }}</span>
               </v-card-title>
-              <v-card-title>
-                <span class="hidden-lg-and-up"><strong>작성자:</strong> {{ props.item.u_id.id }}</span>
+              <v-card-title class="hidden-lg-and-up">
+                <span><strong>작성자:</strong> {{ props.item.u_id.id }}</span>
               </v-card-title>
               <v-card-title>
                 <div v-html="props.item.content"></div>
@@ -125,7 +128,7 @@
                       <v-list-tile-title v-html="item.u_id.id"></v-list-tile-title>
                       <!--<v-list-tile-sub-title style="white-space: pre;" v-html="item.content"></v-list-tile-sub-title>-->
                       <v-list-tile-sub-title v-html="item.content.substr(0,10)"></v-list-tile-sub-title>
-                      <v-list-tile-sub-title v-html="id2time(item._id)"></v-list-tile-sub-title>
+                      <v-list-tile-sub-title v-html="ago(id2time(item._id))"></v-list-tile-sub-title>
                     </v-list-tile-content>
                     <v-spacer></v-spacer>
                     <v-btn color="warning" fab small @click="mdModCmtOpen(props, item)">
@@ -154,22 +157,8 @@
         </v-data-table>
         <div class="text-xs-center pt-2">
           <v-pagination v-model="pagination.page" :length="pages"></v-pagination>
-
-
-
         </div>
       </v-card-text>
-      <v-btn
-        absolute
-        dark
-        fab
-        bottom
-        right
-        color="pink"
-        @click.native.stop="mdAddOpen"
-      >
-        <v-icon>add</v-icon>
-      </v-btn>
     </v-card>
 
     <v-dialog v-model="md" fullscreen transition="dialog-bottom-transition" :overlay="false">
@@ -202,7 +191,9 @@
           <!--:counter="10"-->
           <!--required-->
           <!--&gt;</v-text-field>-->
-          <vue-editor v-model="form.content"></vue-editor>
+          <!--<vue-editor v-model="form.content"></vue-editor>-->
+
+          <wysiwyg v-model="form.content" />
 
 
           <!--<v-btn @click="clear">clear</v-btn>-->
@@ -250,17 +241,29 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-btn
+      floating
+      fixed
+      dark
+      fab
+      bottom
+      right
+      color="pink"
+      @click.native.stop="mdAddOpen"
+    >
+      <v-icon>add</v-icon>
+    </v-btn>
   </v-container>
 </template>
 
 <script>
-  import { VueEditor } from 'vue2-editor';
+  // import { VueEditor } from 'vue2-editor';
 
   export default {
     name: 'notice',
-    components: {
-      VueEditor,
-    },
+    // components: {
+    //   VueEditor,
+    // },
     data() {
       return {
         dialog: false,
@@ -324,13 +327,14 @@
           //     this.items = data.items
           //     this.totalItems = data.total
           //   })
+          // console.log('here');
           this.list();
         },
         deep: true,
       },
     },
     mounted() {
-      this.list();
+      // this.list();
       // this.test();
     },
     computed: {
@@ -355,6 +359,23 @@
       },
     },
     methods: {
+      onError(err) {
+        if (err.response) {
+          if (err.response.status === 401) {
+            return this.swalError('인증시간이 만료되었습니다. 다시 로그인해주세요')
+              .then(() => {
+                location.href = '/#/sign';
+              });
+          }
+        }
+        // if (err === 'authInvalid') {
+        //   return this.swalError('인증시간이 만료되었습니다. 다시 로그인해주세요')
+        //     .then(() => {
+        //       location.href = '/#/sign';
+        //     });
+        // }
+        this.swalError(err.message);
+      },
       swalSuccess(msg) {
         return this.$swal({
           icon: 'success',
@@ -436,7 +457,7 @@
       },
       id2time(_id) {
         if (!_id) return 'unknown';
-        return new Date(parseInt(_id.substring(0, 8), 16) * 1000).toLocaleString();
+        return new Date(parseInt(_id.substring(0, 8), 16) * 1000);
       },
       mdFormClear() {
         this.$refs.mdForm.reset();
@@ -462,13 +483,13 @@
         return p.then((res) => {
           if (!res.data.success) throw new Error(res.data.msg);
           this.totalItems = res.data.d.cnt;
-          this.loading = false;
           this.items = res.data.d.ds;
+          this.loading = false;
         })
           .catch((err) => {
-            this.loading = false;
-            this.swalError(err.message);
+            this.onError(err);
             this.items = [];
+            this.loading = false;
           });
       },
       read(r) {
@@ -490,7 +511,7 @@
           })
           .catch((err) => {
             this.loading = false;
-            this.swalError(err.message);
+            this.onError(err);
           });
       },
       add() {
@@ -506,7 +527,7 @@
             this.list();
           })
           .catch((err) => {
-            this.swalError(err.message);
+            this.onError(err);
           });
       },
       mod() {
@@ -539,7 +560,7 @@
             this.read(this.row);
           })
           .catch((err) => {
-            if (err.message) return this.swalError(err.message);
+            if (err.message) return this.onError(err);
             this.swalWarning('글 수정 취소');
           });
       },
@@ -571,7 +592,7 @@
             this.list();
           })
           .catch((err) => {
-            if (err.message) return this.swalError(err.message);
+            if (err.message) return this.onError(err);
             this.swalWarning('글 삭제 취소');
           });
       },
@@ -589,7 +610,7 @@
             // this.$refs.mdAddCmt.hide();
           })
           .catch((err) => {
-            this.swalError(err.message);
+            this.onError(err);
           });
       },
       modCmt() {
@@ -622,8 +643,8 @@
             // this.refresh();
           })
           .catch((err) => {
-            if (err.message) this.swalError(err.message);
-            else this.swalWarning('댓글 수정 취소');
+            if (err.message) return this.onError(err);
+            this.swalWarning('댓글 수정 취소');
           });
       },
       delCmt(p, cmt, i) {
@@ -654,7 +675,7 @@
             p.item.cmt_ids.splice(i, 1);
           })
           .catch((err) => {
-            if (err.message) return this.swalError(err.message);
+            if (err.message) return this.onError(err);
             this.swalWarning('댓글 삭제 취소');
           });
       },

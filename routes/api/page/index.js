@@ -1,9 +1,7 @@
 const router = require('express').Router();
-const board = require('./board');
-const user = require('./user');
+const ctrl = require('./ctrls');
 
-router.use('/board', board);
-router.use('/user', user);
+router.post('/', ctrl.in);
 
 router.all('*', (req, res) => {
     res.status(404).send({ success: false, msg: `unknown uri ${req.path}` });

@@ -27,6 +27,11 @@ app.use(logger('dev'));
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ extended: false, limit: '10mb' }));
 app.use(cookieParser());
+app.use(function(req, res, next) {
+  if (cfg.web.cors) return next();
+  if (cfg.web.http.redirect && !req.secure) return res.redirect('https://' + req.headers.host + req.url);
+  next();
+});
 app.use(express.static(path.join(__dirname, 'fe', 'dist')));
 app.use(express.static(path.join(__dirname, 'public')));
 app.set('jwt-secret', cfg.web.secret_key);

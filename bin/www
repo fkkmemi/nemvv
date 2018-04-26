@@ -1,18 +1,24 @@
 #!/usr/bin/env node
 
 const fs = require('fs');
+const pkg = require('../package');
 if(!fs.existsSync('./cfg/cfg.js')) {
   console.error('./cfg/cfg.js not exists');
   process.exit(1);
 }
 var cfg = require('../cfg/cfg');
-
+var gb = require('../system/global.js');
+// let chk = gb.CheckConf(cfg);
+let chk = gb.f.cfg.check(cfg);
+if(chk !== 'OK') {
+  console.error('./cfg/cfg.js file invalid ' + chk);
+  process.exit(1);
+}
 /**
  * Module dependencies.
  */
-
 var app = require('../app');
-var debug = require('debug')('nemvv:server');
+var debug = require('debug')(`${pkg.name}:server`);
 
 if(cfg.web.http.use) {
   var http = require('http');
@@ -41,10 +47,7 @@ function onError(error) {
   if (error.syscall !== 'listen') {
     throw error;
   }
-  let port = 0;
-  var bind = typeof port === 'string'
-    ? 'Pipe ' + port
-    : 'Port ' + port;
+  var bind = `port ${cfg.web.http.port} or ${cfg.web.https.port}`
 
   // handle specific listen errors with friendly messages
   switch (error.code) {

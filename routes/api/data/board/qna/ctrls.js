@@ -84,8 +84,7 @@ exports.read = (req, res) => {
 exports.add = (req, res) => {
   const { title, content } = req.body;
 
-  if (!req.user) res.send({ success: false, msg : 'token not exists' });
-  if (!content) res.send({ success: false, msg : 'content not exists' });
+  if (!content) return res.send({ success: false, msg : 'content not exists' });
 
   const bd = new Qna({
     u_id: req.user._id,
@@ -95,10 +94,10 @@ exports.add = (req, res) => {
   });
   bd.save()
     .then(() => {
-      res.send({ success: true });
+      res.send({success: true});
     })
     .catch((err) => {
-      res.send({ success: false, msg : err.message });
+      res.send({success: false, msg : err.message});
     });
 };
 
@@ -189,7 +188,6 @@ exports.modCmt = (req, res) => {
   const f = { _id: set._id };
   const s = { $set: set };
 
-  // QnaComment.findOneAndUpdate(f, s)
   QnaComment.findOne(f)
     .select('u_id')
     .then((r) => {

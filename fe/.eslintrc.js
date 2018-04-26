@@ -51,5 +51,9 @@ module.exports = {
     'no-undef': 0,
     'no-unused-vars': 0,
     'object-shorthand': 0,
+    'no-unused-expressions': 0,
+    'no-return-assign': 0,
+    'arrow-body-style': 0,
+    'func-names': 0,
   }
 }

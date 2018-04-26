@@ -63,9 +63,9 @@ exports.read = (req, res) => {
   const s = { $inc: { cntView: 1 } };
   const o = { new: true };
   Notice.findOneAndUpdate(f, s, o)
-    // .where('_id').equals(_id)
-    // .select('content')
-    // .populate({ path: 'u_id', select:'id'})
+  // .where('_id').equals(_id)
+  // .select('content')
+  // .populate({ path: 'u_id', select:'id'})
     .populate({
       path: 'cmt_ids',
       populate: {
@@ -84,8 +84,8 @@ exports.read = (req, res) => {
 exports.add = (req, res) => {
   const { title, content } = req.body;
 
-  if (!req.user) res.send({ success: false, msg : 'token not exists' });
-  if (!content) res.send({ success: false, msg : 'content not exists' });
+  if (req.user.lv > 1) return res.send({ success: false, msg : 'you have no authority' });
+  if (!content) return res.send({ success: false, msg : 'content not exists' });
 
   const bd = new Notice({
     u_id: req.user._id,
@@ -95,10 +95,10 @@ exports.add = (req, res) => {
   });
   bd.save()
     .then(() => {
-      res.send({ success: true });
+      res.send({success: true});
     })
     .catch((err) => {
-      res.send({ success: false, msg : err.message });
+      res.send({success: false, msg : err.message});
     });
 };
 
@@ -153,7 +153,7 @@ exports.del = (req, res) => {
 exports.addCmt = (req, res) => {
   const { bd_id, content } = req.body;
 
-  if (!content) res.send({ success: false, msg : 'content not exists' });
+  if (!content) return res.send({ success: false, msg : 'content not exists' });
 
   const cmt = new NoticeComment({
     bd_id: bd_id,
@@ -189,7 +189,6 @@ exports.modCmt = (req, res) => {
   const f = { _id: set._id };
   const s = { $set: set };
 
-  // NoticeComment.findOneAndUpdate(f, s)
   NoticeComment.findOne(f)
     .select('u_id')
     .then((r) => {

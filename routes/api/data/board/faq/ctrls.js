@@ -63,9 +63,9 @@ exports.read = (req, res) => {
   const s = { $inc: { cntView: 1 } };
   const o = { new: true };
   Faq.findOneAndUpdate(f, s, o)
-  // .where('_id').equals(_id)
-  // .select('content')
-  // .populate({ path: 'u_id', select:'id'})
+    // .where('_id').equals(_id)
+    // .select('content')
+    // .populate({ path: 'u_id', select:'id'})
     .populate({
       path: 'cmt_ids',
       populate: {
@@ -84,8 +84,7 @@ exports.read = (req, res) => {
 exports.add = (req, res) => {
   const { title, content } = req.body;
 
-  if (!req.user) res.send({ success: false, msg : 'token not exists' });
-  if (!content) res.send({ success: false, msg : 'content not exists' });
+  if (!content) return res.send({ success: false, msg : 'content not exists' });
 
   const bd = new Faq({
     u_id: req.user._id,
@@ -95,10 +94,10 @@ exports.add = (req, res) => {
   });
   bd.save()
     .then(() => {
-      res.send({ success: true });
+      res.send({success: true});
     })
     .catch((err) => {
-      res.send({ success: false, msg : err.message });
+      res.send({success: false, msg : err.message});
     });
 };
 
@@ -117,7 +116,7 @@ exports.mod = (req, res) => {
     .select('u_id')
     .then((r) => {
       if (r.u_id.toString() !== req.user._id) throw new Error('you have no authority');
-      return Faq.update(f, s);
+      return Faq.updateOne(f, s);
     })
     .then(() => {
       res.send({ success: true });
@@ -153,7 +152,7 @@ exports.del = (req, res) => {
 exports.addCmt = (req, res) => {
   const { bd_id, content } = req.body;
 
-  if (!content) res.send({ success: false, msg : 'content not exists' });
+  if (!content) return res.send({ success: false, msg : 'content not exists' });
 
   const cmt = new FaqComment({
     bd_id: bd_id,
@@ -189,7 +188,6 @@ exports.modCmt = (req, res) => {
   const f = { _id: set._id };
   const s = { $set: set };
 
-  // FaqComment.findOneAndUpdate(f, s)
   FaqComment.findOne(f)
     .select('u_id')
     .then((r) => {

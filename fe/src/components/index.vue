@@ -3,6 +3,7 @@
   <v-navigation-drawer
     fixed
     v-model="drawer"
+    :mini-variant.sync="mini"
     app
   >
     <v-toolbar flat class="transparent">
@@ -12,8 +13,13 @@
             <img src="https://randomuser.me/api/portraits/men/85.jpg" >
           </v-list-tile-avatar>
           <v-list-tile-content>
-            <v-list-tile-title>memi</v-list-tile-title>
+            <v-list-tile-title>{{ $user.id }}</v-list-tile-title>
           </v-list-tile-content>
+          <v-list-tile-action>
+            <v-btn icon @click.native.stop="mini = !mini">
+              <v-icon>chevron_left</v-icon>
+            </v-btn>
+          </v-list-tile-action>
         </v-list-tile>
       </v-list>
     </v-toolbar>
@@ -41,16 +47,15 @@
       </v-list-group>
     </v-list>
   </v-navigation-drawer>
-  <v-toolbar color="teal" dark fixed app>
+  <v-toolbar color="indigo" dark fixed app>
     <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
     <!--<img src="/static/logo.png" height="40" />-->
-    <v-icon>tag_faces</v-icon>
+    <v-icon>star</v-icon>
     <v-toolbar-title>
       <v-tooltip bottom>
-        <span slot="activator">NEMVV</span>
-        <span>Node.js Express.js MongoDB Vue Vuetify<br>https://github.com/fkkmemi/nemvv.git</span>
+        <span slot="activator">NEMVV 로그인</span>
+        <span>Node Express MongoDB Vue Vuetify<br>테스트 사이트</span>
       </v-tooltip>
-      <span class="hidden-sm-and-down"> Project</span>
     </v-toolbar-title>
     <v-spacer></v-spacer>
     <!--<v-menu bottom left>-->
@@ -63,11 +68,17 @@
         <!--</v-list-tile>-->
       <!--</v-list>-->
     <!--</v-menu>-->
+    <v-btn icon>
+      <v-icon>search</v-icon>
+    </v-btn>
     <v-menu bottom left>
       <v-btn icon slot="activator" dark>
         <v-icon>more_vert</v-icon>
       </v-btn>
       <v-list>
+        <v-list-tile>
+          <v-list-tile-title @click="info">개인정보 수정</v-list-tile-title>
+        </v-list-tile>
         <v-list-tile @click="signout">
           <v-list-tile-title>로그아웃</v-list-tile-title>
         </v-list-tile>
@@ -89,6 +100,7 @@
   export default {
     data: () => ({
       drawer: null,
+      mini: false,
       items: [
         {
           action: 'feedback',
@@ -117,6 +129,18 @@
               title: '이야기',
               to: {
                 path: '/talk',
+              },
+            },
+          ],
+        },
+        {
+          action: 'memory',
+          title: '관리 메뉴',
+          items: [
+            {
+              title: '사용자 목록',
+              to: {
+                path: '/user',
               },
             },
           ],
@@ -175,11 +199,23 @@
           timer: 2000,
         });
       },
+      info() {
+        location.href = '/#/userModify';
+      },
       signout() {
         this.$cookie.delete('token');
-        this.swalSuccess('로그아웃 되었습니다')
-          .then(() => { location.href = '/#/sign'; })
-          .cache(e => this.swalError(e.message));
+        // this.swalSuccess('로그아웃 되었습니다');
+        return this.swalSuccess('로그아웃 되었습니다')
+          .then(() => {
+            location.href = '/#/sign';
+            // setTimeout(() => { location.href = '/#/sign'; })
+            // setTimeout(() => {
+            //   location.href = '/#/sign';
+            // }, 1000);
+          });
+          // .cache((err) => {
+          //   this.swalError(err.message);
+          // });
       },
     },
   };
