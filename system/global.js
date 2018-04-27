@@ -9,13 +9,6 @@ exports.v = { //variables
   db: {
     conn: null,
   },
-  net: {
-    loop: {},
-    kumho: {},
-  }
-// cash: {},
-// sys: 'ok',
-// mem: 'ok',
 };
 
 exports.f = { //functions
