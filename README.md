@@ -62,7 +62,7 @@ module.exports = {
     },
   },
   mail: {
-    host: 'mail.xxx.com',
+    host: 'smtp.xxx.com',
     port: 25,
     secure: false,
     auth: {

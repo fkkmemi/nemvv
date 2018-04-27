@@ -19,8 +19,6 @@ exports.add = (req, res) => {
     birth: birth,
   };
 
-  if (email.match('@loopsystem.co.kr')) usr.lv = 2;
-
   const u = new User(usr);
 
   u.save()
